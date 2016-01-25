@@ -38,57 +38,44 @@ int main(int argc, char **argv)
         char *           output_filename;        // the output file name
         unsigned char ** seq    = NULL;          // the sequence in memory
         unsigned char ** seq_id = NULL;          // the sequence id in memory
-	char *           alphabet;               // the alphabet
-	unsigned int     l, L, q, Q;             // the program parameters
+	unsigned int     l, q;             // the program parameters
 	double           P;                      // the program parameters
 	char * 		 edit_distance;
 	unsigned int     h, i, j, k;
-	unsigned int     M, S, I, D;   //costs for edit distance
 
 	/* Decodes the arguments */
         i = decode_switches ( argc, argv, &sw );
 
 	/* Check the arguments */
-        if ( i < 10 )
+        if ( i < 5 )
         {
                 usage ();
                 return ( 1 );
         }
         else
         {
-                if      ( ! strcmp ( "DNA", sw . alphabet ) )   alphabet = ( char * ) DNA;
-                else if ( ! strcmp ( "PROT", sw . alphabet ) )  alphabet = ( char * ) PROT;
-                else
-                {
-                        fprintf ( stderr, " Error: alphabet argument 'a' should be `DNA' for nucleotide sequences or `PROT' for protein sequences or `USR' for sequences over a user-defined alphabet!\n" );
-                        return ( 1 );
-                }
-
-                if      ( sw . L < sw . l || sw . Q < sw . q )
-                {
-                        fprintf ( stderr, " Error: The optional maxmimum parameters cannot be less than the mandatory parameters!\n" );
-                        return ( 1 );
-                }
-
-                if      ( sw . P < 0 || sw . P >= 5.1 )
-                {
-                        fprintf ( stderr, " Error: The percentage flag should be in the range of 0 to 5%%.\n" );
-                        return ( 1 );
-                }
-
                 q       = sw . q;
-                Q       = sw . Q;
                 l       = sw . l;
-                L       = sw . L;
 		P       = sw . P;
 	
 		if      ( ! strcmp ( "Y" , sw . e ) )   edit_distance = ( char * ) myers;
 		else if ( ! strcmp ( "V" , sw . e ) )   edit_distance = ( char * ) standardEditD;		
+		if ( sw . e == NULL )
+		{
+			fprintf ( stderr, " Error: Edit distance method 'e' has not been defined!\n" );
+			return ( 1 );
+		}
+		else if ( strcmp ( sw . e, myers ) != 0 &&  strcmp ( sw . e, standardEditD ) != 0 )
+		{ 
+			fprintf ( stderr, " Error: Edit distance method 'e' must be defined with either 'V' for standard edit distance or 'Y' for Myers\n" );
+			return ( 1 );
+		}	
 
-		M = sw. M;
-		S = sw . S;
-		I = sw. I;
-		D = sw. D;
+		if ( sw . P == 0.0 )
+		{
+			fprintf ( stderr, " Error: Refinement 'P' has not been defined!\n" );
+			return ( 1 );
+		}
 
                 input_filename          = sw . input_filename;
                 output_filename         = sw . output_filename;
@@ -171,15 +158,7 @@ int main(int argc, char **argv)
                                 max_alloc_seq_len += ALLOC_SIZE;
                         }
 
-                        if( strchr ( alphabet, c ) )
-                        {
-                                seq[ num_seqs ][ seq_len++ ] = c;
-                        }
-                        else
-                        {
-                                fprintf ( stderr, " Error: input file %s contains an unexpected character %c!\n", input_filename, c );
-                                return ( 1 );
-                        }
+                        seq[ num_seqs ][ seq_len++ ] = c;
 
                 }
 
@@ -206,18 +185,6 @@ int main(int argc, char **argv)
 	unsigned int m = strlen ( ( char * ) seq[0] );
 	unsigned int n = strlen ( ( char * ) seq[1] );
 
-	if ( sw . L < 1 || sw . L > m - sw . q + 1  || sw . L > n - sw . q + 1 )
-	{
-        	fprintf( stderr, " Error: Illegal block length.\n" );
-		return ( 1 );
-	}
-
-	if ( sw . Q >= sw . l )
-	{
-        	fprintf( stderr, " Error: Illegal q-gram length.\n" );
-		return ( 1 );
-	}
-
 	if ( num_seqs > 2 )
 	{
         	fprintf( stderr, " Warning: %d sequences were read from file %s.\n", num_seqs, input_filename );
@@ -226,49 +193,9 @@ int main(int argc, char **argv)
 
 
 	/* Run the algorithm */
-
-	string alphabetLetters = "";
-	if ( strcmp ( sw . alphabet, ALPHABET_DNA ) == 0 )
-	{
-		alphabetLetters = DNA;
-	}
-	else if ( strcmp ( sw. alphabet, ALPHABET_PROT ) == 0 )
-	{
-		alphabetLetters = PROT;
-	}
-	else
-	{
-		alphabetLetters = IUPAC;
-	}
 	unsigned int distance = m + n;
 	unsigned int rotation = 0;
-	TPOcc De, DTemp;
-	De . err = 0;
-	struct TSwitch swTemp;
-	memcpy ( &swTemp, &sw, sizeof ( TSwitch ) );
-
- 	if ( sw . e == NULL )
-	{
-		fprintf ( stderr, " Error: Edit distance method 'e' has not been defined!\n" );
-		return ( 1 );
-	}
-	else if ( strcmp ( sw . e, myers ) != 0 &&  strcmp ( sw . e, standardEditD ) != 0 )
-	{ 
-		fprintf ( stderr, " Error: Edit distance method 'e' must be defined with either 'V' for standard edit distance or 'Y' for Myers\n" );
-		return ( 1 );
-	}	
-
-	if ( sw . P == 0.0 )
-	{
-		fprintf ( stderr, " Error: Refinement 'P' has not been defined!\n" );
-		return ( 1 );
-	}
-	else
-	{
-		sacsc_refinement( seq[0], seq[1], sw, &rotation, &distance);
-		De . rot = rotation;
-		De . err = distance;
-	}
+	sacsc_refinement( seq[0], seq[1], sw, &rotation, &distance);
 
 	if ( ! ( out_fd = fopen ( output_filename, "w") ) )
 	{
@@ -283,7 +210,7 @@ int main(int argc, char **argv)
 		return ( 1 );
 	}
 
-	create_rotation ( seq[0], De . rot, rot_str );
+	create_rotation ( seq[0], rotation, rot_str );
 
 	double end = gettime();
 
@@ -305,10 +232,10 @@ int main(int argc, char **argv)
         fprintf( stderr, " q-gram length is %d\n",                 sw . q );
         fprintf( stderr, " Number of blocks is %d\n",              m / sw . l );
         fprintf( stderr, " Block length is %d\n",                  sw . l );
-        fprintf( stderr, " Edit distance: %u\n",       De . err );
-		 if (  strcmp ( sw.e, myers ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i, M = %i\n", 1, 1, 1, 0);
-		 else if (  strcmp ( sw.e, standardEditD ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i, M = %i\n", sw . I , sw . D , sw . S , sw . M );
-        fprintf( stderr, " Rotation                 : %u\n",       De . rot );
+        fprintf( stderr, " Edit distance: %u\n",       distance );
+		 if (  strcmp ( sw.e, myers ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i\n", 1, 1, 1);
+		 else if (  strcmp ( sw.e, standardEditD ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i \n", sw . I , sw . D , sw . S );
+        fprintf( stderr, " Rotation                 : %u\n",       rotation );
         fprintf( stderr, " (Multi)FASTA output file : %s\n",       sw . output_filename );
         fprintf( stderr, "Elapsed time for comparing sequences: %lf secs\n", ( end - start ) );
 
@@ -323,7 +250,6 @@ int main(int argc, char **argv)
 	free ( sw . e);
         free ( sw . input_filename );
         free ( sw . output_filename );
-        free ( sw . alphabet );
 
 	return ( 0 );
 }

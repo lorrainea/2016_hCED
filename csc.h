@@ -22,48 +22,28 @@
 #define ALLOC_SIZE              1048576
 #define DEL                     '$'
 #define DEL_STR                 "$"
-#define ALPHABET_DNA            "DNA"
-#define ALPHABET_PROT           "PROT"
-#define ALPHABET_IUPAC          "IUPAC"
-#define DNA                     "ACGTN"                         //DNA alphabet
-#define IUPAC                   "ACGTUWSMKRYBDHVN"          	//IUPAC nucleotide alphabet
-#define PROT                    "ARNDCQEGHILKMFPSTWYVX"         //Proteins alphabet
 #define standardEditD           "V"
 #define myers	                "Y"
 
-#define cscmax(a,b) ((a) > (b)) ? (a) : (b)
-#define cscmin(a,b) ((a) < (b)) ? (a) : (b)
+#define MAX2(a,b) ((a) > (b)) ? (a) : (b)
+#define MIN2(a,b) ((a) < (b)) ? (a) : (b)
 
 struct TSwitch
 {
     char *               input_filename;         // the input file name
     char *               output_filename;        // the output file name
-    char *               alphabet;               // the output file name
     unsigned int         l;                      // block length (min. required)
-    unsigned int         L;                      // block length (max. optional)
     unsigned int         q;                      // q-gram size (min. required)
-    unsigned int         Q;                      // q-gram size (max. optional)
     double               P;                      // Percent Sequence to align at ends
     char * 		 e;			 // edit distance method
-    unsigned int         M, S, I, D;             //costs for edit distance; match, substitution, insertion, deletion
+    unsigned int         S, I, D;                // EDIT DISTANCE costs for substitution, insertion, deletion
+    int                  m, r, f, g, O, E;       // SIMILARITY costs for edit distance match, substitution, insertion, deletion, gap open, gap extend
 };
-
-struct TPOcc
-{
-    unsigned int         err;
-    unsigned int         rot;
-};
-
-extern int EDNA[];
-extern int BLOSUM[];
 
 double gettime( void );
 int decode_switches ( int argc, char * argv [], struct TSwitch * sw );
 void usage ( void );
 void create_rotation ( unsigned char * x, unsigned int offset, unsigned char * rotation );
 void create_backward_rotation ( unsigned char * x, unsigned int offset, unsigned char * rotation );
-//int refine ( unsigned char * x, unsigned int m, unsigned char * y, unsigned int n, double p, char * alphabet );
-void init_substitution_score_tables ();
-double delta ( char a, char b, char * alphabet );
 
 #endif

@@ -18,7 +18,7 @@
 
 int editDistanceMyers(unsigned char *xInput, unsigned char *yInput, int mInput, int nInput, unsigned int * distance);
 
-unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance, int match, int sub, int ins, int del);
+unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance, int sub, int ins, int del);
 
 unsigned int sacsc_refinement (  unsigned char * x, unsigned char * y, struct TSwitch  sw, unsigned int * rotation, unsigned int * distance);
    

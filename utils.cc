@@ -31,19 +31,21 @@
 
 static struct option long_options[] =
  {
-   { "alphabet",                required_argument, NULL, 'a' },
    { "input-file",              required_argument, NULL, 'i' },
    { "output-file",             required_argument, NULL, 'o' },
-   { "q-length-min",            required_argument, NULL, 'q' },
-   { "q-length-max",            optional_argument, NULL, 'Q' },
-   { "block-length-min",        required_argument, NULL, 'l' },
-   { "block-length-max",        optional_argument, NULL, 'L' },
-   { "percent-refine",          optional_argument, NULL, 'P' },
+   { "q-length",            	required_argument, NULL, 'q' },
+   { "block-length",        	required_argument, NULL, 'l' },
+   { "refine-blocks",          	optional_argument, NULL, 'P' },
    { "edit-distance",           optional_argument, NULL, 'e' },
-   { "cost-match",     		optional_argument, NULL, 'M' },
    { "cost-substitution",	optional_argument, NULL, 'S' },
    { "cost-insertion",		optional_argument, NULL, 'I' },
    { "cost-deletion",		optional_argument, NULL, 'D' },
+   { "score-match",     	optional_argument, NULL, 'm' },
+   { "score-mismatch",     	optional_argument, NULL, 'r' },
+   { "score-insertion",     	optional_argument, NULL, 'f' },
+   { "score-deletion",     	optional_argument, NULL, 'g' },
+   { "gap-open",     		optional_argument, NULL, 'O' },
+   { "gap-extend",     		optional_argument, NULL, 'E' },
    { "help",                    no_argument,       NULL, 'h' },
    {  NULL,                     0,                 NULL,  0  }
  };
@@ -61,31 +63,29 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
    int          args;
 
    /* initialisation */
-   sw -> alphabet                       = NULL;
    sw -> input_filename                 = NULL;
    sw -> output_filename                = NULL;
    sw -> q                              = 5;
-   sw -> Q                              = 0;
-   sw -> l                              = 10;
-   sw -> L                              = 0;
-   sw -> P                              = 0.0;
-   sw -> e      			= NULL;
-   sw -> M				= 0;
+   sw -> l                              = 50;
+   sw -> P                              = 1.0;
+   sw -> e                              = ( char * ) malloc ( ( 1 + 1 ) * sizeof ( char ) );
+   sw -> e[0]      			= 'Y';
+   sw -> e[1]      			= '\0';
    sw -> S				= 1;
    sw -> I 				= 1;
    sw -> D				= 1;
+   sw -> m				= 1;
+   sw -> r				= -1;
+   sw -> f				= -1;
+   sw -> g				= -1;
+   sw -> O				= 0;
+   sw -> E				= 0;
    args = 0;
 
-   while ( ( opt = getopt_long ( argc, argv, "a:i:o:q:Q:l:L:P:e:M:S:I:D:h", long_options, &oi ) ) != - 1 )
+   while ( ( opt = getopt_long ( argc, argv, "i:o:q:l:P:e:S:I:D:m:r:f:g:O:E:h", long_options, &oi ) ) != - 1 )
     {
       switch ( opt )
        {
-         case 'a':
-           sw -> alphabet = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
-           strcpy ( sw -> alphabet, optarg );
-           args ++;
-           break;
-
          case 'i':
            sw -> input_filename = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
            strcpy ( sw -> input_filename, optarg );
@@ -95,12 +95,6 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
          case 'o':
            sw -> output_filename = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
            strcpy ( sw -> output_filename, optarg );
-           args ++;
-           break;
-
-	 case 'e':
-           sw -> e = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
-           strcpy ( sw -> e, optarg );
            args ++;
            break;
 
@@ -114,15 +108,6 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
            args ++;
            break;
 
-         case 'Q':
-           val = strtol ( optarg, &ep, 10 );
-           if ( optarg == ep )
-            {
-              return ( 0 );
-            }
-           sw -> Q = val;
-           break;
-
          case 'l':
            val = strtol ( optarg, &ep, 10 );
            if ( optarg == ep )
@@ -133,15 +118,6 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
            args ++;
            break;
 
-         case 'L':
-           val = strtol ( optarg, &ep, 10 );
-           if ( optarg == ep )
-            {
-              return ( 0 );
-            }
-           sw -> L = val;
-           break;
-
          case 'P':
            val = (double) atof ( optarg );
            if ( optarg == ep )
@@ -150,14 +126,11 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
             }
            sw -> P = val;
            break;
-	
-	case 'M':
-           val = strtol ( optarg, &ep, 10 );
-           if ( optarg == ep )
-            {
-              return ( 0 );
-            }
-           sw -> M = val;
+
+	 case 'e':
+           free ( sw -> e );
+           sw -> e = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
+           strcpy ( sw -> e, optarg );
            break;
 
 	case 'S':
@@ -187,21 +160,66 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
            sw -> D = val;
            break;
 
+	case 'm':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> m = val;
+           break;
+
+	case 'r':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> r = val;
+           break;
+
+	case 'f':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> f = val;
+           break;
+
+	case 'g':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> g = val;
+           break;
+
+	case 'O':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> O = val;
+           break;
+
+	case 'E':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> E = val;
+           break;
+
          case 'h':
            return ( 0 );
        }
     }
 
-   if ( sw -> Q == 0 )
-     {
-       sw -> Q = sw -> q;
-     }
-   if ( sw -> L == 0 )
-     {
-       sw -> L = sw -> l;
-     }
-
-   if ( args < 6 )
+   if ( args < 4 )
      {
        usage ();
        exit ( 1 );
@@ -217,31 +235,29 @@ Usage of the tool
 void usage ( void )
  {
    fprintf ( stdout, " hCED <options>\n" );
-   fprintf ( stdout, " Required:\n" );
-   fprintf ( stdout, "  -a, --alphabet              <str>     `DNA' for nucleotide  sequences or `PROT'\n"
-                     "                                        for protein  sequences. \n" );
+   fprintf ( stdout, " Required arguments for saCSC:\n" );
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
    fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
-   fprintf ( stdout, "  -q, --q-length-min          <int>     The q-gram length.\n");
-   fprintf ( stdout, "  -l, --block-length-min      <int>     The length of each block.\n\n");
-   fprintf ( stdout, "  -Q, --q-length-max          <int>     The maximum q-gram length. The program\n"
-                     "                                        will try all in range min .. max.\n" );
-   fprintf ( stdout, "  -L, --block-length-max      <int>     The maximum length of each block. The\n"
-                     "                                        program will try all in range min .. max.\n" );
-   fprintf ( stdout, "  -P, --percent-refine        <float>   Refine the alignment of hCSC/saCSC by\n"
-                     "                                        checking a percentage of the ends (e.g. 2.5)\n" );
-   fprintf ( stdout, "  -e, --edit distance method  <str>     Choose 'Y' for Myers or 'V' for standard edit distance\n\n" );
-   fprintf ( stdout, " Optional:\n\n" );
-   fprintf ( stdout, "  -M, --Cost of match         <int>     Cost of match when 'V' is chosen for edit\n"
-                     "                                        distance method. Default: M = 0.\n" );
-   fprintf ( stdout, "  -S, --Cost of substitution  <int>     Cost of substitution when 'V is chosen for edit\n"
-                     "                                        distance method. Default: S = 1.\n" );
-   fprintf ( stdout, "  -I, --Cost of insertion     <int>     Cost of insertion when 'V' is chosen for edit\n"
-                     "                                        distance method. Default: I = 1.\n" );
-   fprintf ( stdout, "  -D, --Cost of deletion      <int>     Cost of deletion when 'V' is chosen for edit\n"
-                     "                                        distance method. Default: D = 1.\n" );
-	
-	
+   fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length.\n");
+   fprintf ( stdout, "  -l, --block-length          <int>     The length of each block.\n\n");
+   fprintf ( stdout, " Optional for the Refinement stage:\n" );
+   fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
+                     "                                        checking a block percentage of the ends. Default: 1.\n" );
+   fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
+   fprintf ( stdout, "  -r, --score-mismatch        <int>     Score of mismatch for refinement. Default: -1.\n" );
+   fprintf ( stdout, "  -f, --score-insertion       <int>     Score of insertion for refinement. Default: -1.\n" );
+   fprintf ( stdout, "  -g, --score-deletion        <int>     Score of deletion for refinement. Default: -1.\n" );
+   fprintf ( stdout, "  -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.\n" );
+   fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n\n" );
+   fprintf ( stdout, " Optional for edit distance model:\n" );
+   fprintf ( stdout, "  -e, --edit distance method  <str>     Choose 'Y' for unit cost or 'V' for general edit distance.\n"
+                     "                                        Default: Y.\n" );
+   fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution when 'V is chosen for edit\n"
+                     "                                        distance method. Default: 1.\n" );
+   fprintf ( stdout, "  -I, --cost-insertion        <int>     Cost of insertion when 'V' is chosen for edit\n"
+                     "                                        distance method. Default: 1.\n" );
+   fprintf ( stdout, "  -D, --cost-deletion         <int>     Cost of deletion when 'V' is chosen for edit\n"
+                     "                                        distance method. Default: 1.\n" );
  }
 
 double gettime( void )

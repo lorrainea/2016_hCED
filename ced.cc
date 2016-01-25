@@ -27,8 +27,6 @@
 #include <assert.h>
 #include <float.h>
 #include <sys/time.h>
-#include "EDNAFULL.h"
-#include "EBLOSUM62.h"
 
 #include "csc.h"
 #include "sacsc.h"
@@ -37,85 +35,70 @@
 using namespace std;
 using namespace seqan;
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
+#define MAX3(a, b, c) ((a) > (b) ? ((a) > (c) ? (a) : (c)) : ((b) > (c) ? (b) : (c)))
 
 
-int EDNA[90];
-int BLOSUM[91];
-
-void init_substitution_score_tables ()
-{
-    int i;
-    char edna[] = "ATGCSWRYKMBVHDN";
-    for ( i = 0; i < 15; i ++ ) {
-	EDNA[(int)edna[i]] = i;
-    }
-    char blosum[] = "ARNDCQEGHILKMFPSTWYVBZX*";
-    for ( i = 0; i < 24; i ++ ) {
-	BLOSUM[(int)blosum[i]] = i;
-    }
-}
- 
-double delta ( char a, char b, char * alphabet )
+int delta ( char a, char b, struct TSwitch sw )
  {
-    if ( a == DEL || b == DEL ) {
+    if ( a == DEL || b == DEL ) 
+    {
 	return 0;
     }
-    if ( strcmp ( alphabet, ALPHABET_PROT ) == 0 )
+    if ( a == b )
     {
-	return ( double ) EBLOSUM62_matrix[ BLOSUM[(int)a] ][ BLOSUM[(int)b] ];
+	return sw . m;
     }
     else
     {
-	return ( double ) EDNAFULL_matrix[ EDNA[(int)a] ][ EDNA[(int)b] ];
+	return sw . r;
     }
  }
 
-unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, double o, double e, double * score, char * alphabet )
+unsigned int nw_ag ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score )
 {
-	init_substitution_score_tables();
 	int i;
 	int j;
-	double g = o;
-	double h = e;
-	double u, v, w;
+	int g = sw . O;
+	int h = sw . E;
+	int u, v, w;
 
-	double ** T;
-	double ** I;
-	double ** D;
-	if ( ( T = ( double ** ) calloc ( ( m + 1 ) , sizeof( double * ) ) ) == NULL )
+	int ** T;
+	int ** I;
+	int ** D;
+	if ( ( T = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
         {
                 fprintf( stderr, " Error: T could not be allocated!\n");
                 return ( 0 );
         }
         for ( i = 0; i < m + 1; i ++ )
         {
-                if ( ( T[i] = ( double * ) calloc ( ( n + 1 ) , sizeof( double ) ) ) == NULL )
+                if ( ( T[i] = ( int * ) calloc ( ( n + 1 ) , sizeof( int ) ) ) == NULL )
                 {
                         fprintf( stderr, " Error: T could not be allocated!\n");
                         return ( 0 );
                 }
         }
-	if ( ( I = ( double ** ) calloc ( ( m + 1 ) , sizeof( double * ) ) ) == NULL )
+	if ( ( I = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
         {
                 fprintf( stderr, " Error: I could not be allocated!\n");
                 return ( 0 );
         }
         for ( i = 0; i < m + 1; i ++ )
         {
-                if ( ( I[i] = ( double * ) calloc ( ( n + 1 ) , sizeof( double ) ) ) == NULL )
+                if ( ( I[i] = ( int * ) calloc ( ( n + 1 ) , sizeof( int ) ) ) == NULL )
                 {
                         fprintf( stderr, " Error: I could not be allocated!\n");
                         return ( 0 );
                 }
         }
-	if ( ( D = ( double ** ) calloc ( ( m + 1 ) , sizeof( double * ) ) ) == NULL )
+	if ( ( D = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
         {
                 fprintf( stderr, " Error: D could not be allocated!\n");
                 return ( 0 );
         }
         for ( i = 0; i < m + 1; i ++ )
         {
-                if ( ( D[i] = ( double * ) calloc ( ( n + 1 ) , sizeof( double ) ) ) == NULL )
+                if ( ( D[i] = ( int * ) calloc ( ( n + 1 ) , sizeof( int ) ) ) == NULL )
                 {
                         fprintf( stderr, " Error: D could not be allocated!\n");
                         return ( 0 );
@@ -123,39 +106,39 @@ unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned
         }
         
         for ( i = 0; i < m + 1; i++ )
-			{
-				D[i][0] = -DBL_MAX;
-				I[i][0] = -DBL_MAX;
-			}
-			for ( j = 1; j < n + 1; j++ )
-			{
-				D[0][j] = -DBL_MAX;
-				I[0][j] = -DBL_MAX;
-			}
-		
-			T[0][0] = 0;
-			if ( m > 0 )
-				T[1][0] = g;
-			for ( i = 2; i < m + 1; i++ )
-			T[i][0] = T[i - 1][0] + h;
-			if ( n > 0 )
-			T[0][1] = g;
-			for ( j = 2; j < n + 1; j++ )
-		T[0][j] = T[0][j - 1] + h;
+	{
+		D[i][0] = m * sw . r;
+		I[i][0] = m * sw . r;
+	}
+	for ( j = 1; j < n + 1; j++ )
+	{
+		D[0][j] = n * sw . r;
+		I[0][j] = n * sw . r;
+	}
+
+	T[0][0] = 0;
+	if ( m > 0 )
+		T[1][0] = g;
+	for ( i = 2; i < m + 1; i++ )
+	T[i][0] = T[i - 1][0] + h;
+	if ( n > 0 )
+	T[0][1] = g;
+	for ( j = 2; j < n + 1; j++ )
+	T[0][j] = T[0][j - 1] + h;
 
 	for( i = 1; i < m + 1; i++ )
 	{
         	for( j = 1; j < n + 1; j++ )
         	{
-			D[i][j] = cscmax ( D[i - 1][j] + h, T[i - 1][j] + g );
+			D[i][j] = MAX2 ( D[i - 1][j] + h, T[i - 1][j] + g );
 			u = D[i][j];
 
-			I[i][j] = cscmax ( I[i][j - 1] + h, T[i][j - 1] + g );
+			I[i][j] = MAX2 ( I[i][j - 1] + h, T[i][j - 1] + g );
 			v = I[i][j];
 
-			w = T[i - 1][j - 1] + delta ( t[j - 1], p[i - 1], alphabet );
+			w = T[i - 1][j - 1] + delta ( t[j - 1], p[i - 1], sw );
 
-			T[i][j] = cscmax ( w, cscmax ( u, v ) );
+			T[i][j] = MAX3 ( w, u, v );
         	}
     	}
 
@@ -175,12 +158,55 @@ unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned
 	return EXIT_SUCCESS;
 }
 
+unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score )
+{
+	int ins = sw . f;
+	int del = sw . g;
+	int ** T;
+	int i, j;
+	if ( ( T = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
+        {
+                fprintf( stderr, " Error: T could not be allocated!\n");
+                return ( 0 );
+        }
+        for ( i = 0; i < m + 1; i ++ )
+        {
+                if ( ( T[i] = ( int * ) calloc ( ( n + 1 ) , sizeof( int ) ) ) == NULL )
+                {
+                        fprintf( stderr, " Error: T could not be allocated!\n");
+                        return ( 0 );
+                }
+        }
+        for ( i = 0; i < m + 1; i++ )
+	{
+		T[i][0] = ins * i;
+	}
+	for ( j = 1; j < n + 1; j++ )
+	{
+		T[0][j] = del * j;
+	}
+
+        for ( i = 1; i < m + 1; i++ )
+	{
+		for ( j = 1; j < n + 1; j++ )
+			T[i][j] = MAX3(T[i][j-1] + ins, T[i-1][j] + del, T[i-1][j-1] + delta ( t[j - 1], p[i - 1], sw ));
+	}
+
+    	( * score ) = T[m][n];
+        for ( i = 0; i < m + 1; i ++ )
+	{
+		free ( T[i] );
+	}
+	free ( T );
+
+	return EXIT_SUCCESS;
+}
+
 unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSwitch  sw, unsigned int * rotation, unsigned int * distance ) 
 {
 	unsigned int rot;
 	unsigned int dist;
 	circular_sequence_comparison ( x, y, sw, &rot, &dist );
-	//fprintf ( stderr, "rot:%d\n", rot);
 
 	( * distance ) = dist;
 
@@ -194,12 +220,10 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	unsigned char * Y;
 
 	unsigned int sl = sw . P * ( sw . l ); //section length
-	sl = cscmin ( sl, cscmin ( m/2, n/2 ) );
-	//fprintf ( stderr, "sl: %d\n", sl);
+	sl = MIN3 ( sl, m/2, n/2 );
 
 	X = ( unsigned char * ) calloc( ( 3 * sl + 1 ) , sizeof( unsigned char ) );
 	Y = ( unsigned char * ) calloc( ( 3 * sl + 1 ) , sizeof( unsigned char ) );
-
 
 	memcpy ( &X[0], &xr[0], sl );
 	for ( int i = 0; i < sl; i++ )
@@ -213,16 +237,11 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	memcpy ( &Y[sl + sl], &y[n - sl], sl );
 	Y[3 * sl] = '\0';
 
-	//fprintf ( stderr, "X: %s\n", X);
-	//fprintf ( stderr, "Y: %s\n", Y); 
-
-	double O = -6;
-	double E = -5;
 	unsigned int mm = sl + sl + sl;
 	unsigned int nn = sl + sl + sl;
 
-	double score = -DBL_MAX;
-	double max_score = score;
+	int score = -INT_MAX;
+	int max_score = score;
 	unsigned int rrot = 0;
 	unsigned char * Xr = ( unsigned char * ) calloc( ( 3 * sl + 1 ) , sizeof( unsigned char ) );
 	for ( int i = 0; i < mm; i++ )
@@ -233,7 +252,10 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 		Xr[0] = '\0';
 		create_rotation ( X, i, Xr );
 
-		nw ( Xr, mm , Y, nn, O, E, &score, sw . alphabet );
+		if ( sw . O < 0 )
+			nw_ag ( Xr, mm , Y, nn, sw, &score );
+		else
+			nw ( Xr, mm , Y, nn, sw, &score );
 
 		if ( score > max_score )
 		{
@@ -242,7 +264,6 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 		}	 
 	}
 	free ( Xr);
-	//fprintf ( stderr, "RRot: %d\n", rrot );
 
 	int final_rot;
         if ( rrot < sl )
@@ -265,19 +286,16 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
         else
                 ( * rotation ) = final_rot;
 	
-	//fprintf ( stderr, "final_rot: %d\n", final_rot );
-
 	unsigned char * x_final_rotation = ( unsigned char * ) calloc( ( m + 1 ) , sizeof( unsigned char ) );
 	
 	create_rotation( x, ( *rotation ), x_final_rotation );
 
 	if ( strcmp ( sw . e, standardEditD ) == 0 )
 	{
-		int match = sw . M;
 		int sub = sw . S;
 		int ins = sw . I; 
 		int del = sw . D;
-		editDistance( x_final_rotation, y, m, n, distance, match, sub, ins, del ); 	
+		editDistance( x_final_rotation, y, m, n, distance, sub, ins, del ); 	
 	}
 	else if ( strcmp ( sw . e,myers ) == 0 )
 	{
@@ -302,15 +320,17 @@ int editDistanceMyers( unsigned char * xInput, unsigned char * yInput, int mInpu
 
     ( * distance ) = score;
 
-    return 1;
+	return EXIT_SUCCESS;
 }
 
 
-unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance , int match, int sub, int ins, int del )
+unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance, int sub, int ins, int del )
 {
     unsigned int x, y, lastdiag, olddiag;
-
-    unsigned int column[mInput+1];
+    unsigned int match = 0;
+    unsigned int * column;
+    column = ( unsigned int * ) calloc ( mInput + 1 , sizeof(unsigned int));
+	
 
     for (y = 1; y <= mInput; y++)
         column[y] = y;
@@ -327,6 +347,7 @@ unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mI
     }
 	
     ( * distance ) = column[mInput];
-
-    return 1;
+    free ( column );
+	return EXIT_SUCCESS;
 }
+
