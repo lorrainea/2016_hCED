@@ -7,4 +7,4 @@ Given two sequences x and y, hCED finds the approximate cyclic edit distance
 of x and y.
 
 To compile hCED, please follow the instructions given in file INSTALL.
-# 2016_hCED
+# hCED
