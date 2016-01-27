@@ -1,4 +1,4 @@
-hCED: Heuristic Cyclic Edit Distance
+hCED: Heuristics for Cyclic Edit Distance
 ===
 
 GNU GPLv3 License; Copyright (C) 2016 Solon P. Pissis, Lorraine A. K. Ayad
