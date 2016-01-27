@@ -10,7 +10,7 @@ EXE=    hCED
  
 SRC=    csc.cc utils.cc sacsc.cc ced.cc
  
-HD=     csc.h ced.h Makefile.64-bit.gcc
+HD=     csc.h ced.h sacsc.h Makefile.64-bit.gcc
  
 # 
 # No need to edit below this line 
