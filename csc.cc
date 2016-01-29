@@ -1,6 +1,6 @@
 /**
-    CSC: Circular Sequence Comparison
-    Copyright (C) 2015 Solon P. Pissis, Ahmad Retha, Fatima Vayani 
+    hCED: Heuristic Cyclic Edit Distance
+    Copyright (C) 2016 Solon P. Pissis, Lorraine A. K. Ayad 
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,14 +40,14 @@ int main(int argc, char **argv)
         unsigned char ** seq_id = NULL;          // the sequence id in memory
 	unsigned int     l, q;             // the program parameters
 	double           P;                      // the program parameters
-	char * 		 edit_distance;
+	char * 		 editDistance;
 	unsigned int     h, i, j, k;
 
 	/* Decodes the arguments */
         i = decode_switches ( argc, argv, &sw );
 
 	/* Check the arguments */
-        if ( i < 5 )
+        if ( i < 4 )
         {
                 usage ();
                 return ( 1 );
@@ -56,26 +56,15 @@ int main(int argc, char **argv)
         {
                 q       = sw . q;
                 l       = sw . l;
-		P       = sw . P;
+		P	= sw . P;
 	
-		if      ( ! strcmp ( "Y" , sw . e ) )   edit_distance = ( char * ) myers;
-		else if ( ! strcmp ( "V" , sw . e ) )   edit_distance = ( char * ) standardEditD;		
-		if ( sw . e == NULL )
+		if      ( ! strcmp ( "Y" , sw . e ) )   editDistance = ( char * ) edit_distance;
+		else if ( ! strcmp ( "N" , sw . e ) )   editDistance = ( char * ) no_edit_distance;
+		else
 		{
-			fprintf ( stderr, " Error: Edit distance method 'e' has not been defined!\n" );
-			return ( 1 );
-		}
-		else if ( strcmp ( sw . e, myers ) != 0 &&  strcmp ( sw . e, standardEditD ) != 0 )
-		{ 
-			fprintf ( stderr, " Error: Edit distance method 'e' must be defined with either 'V' for standard edit distance or 'Y' for Myers\n" );
-			return ( 1 );
-		}	
-
-		if ( sw . P == 0.0 )
-		{
-			fprintf ( stderr, " Error: Refinement 'P' has not been defined!\n" );
-			return ( 1 );
-		}
+			fprintf ( stderr, " Error: Choose 'Y' to calculate edit distance or 'N' to only return the rotation!\n");
+                	return ( 0 );
+		}		
 
                 input_filename          = sw . input_filename;
                 output_filename         = sw . output_filename;
@@ -232,9 +221,11 @@ int main(int argc, char **argv)
         fprintf( stderr, " q-gram length is %d\n",                 sw . q );
         fprintf( stderr, " Number of blocks is %d\n",              m / sw . l );
         fprintf( stderr, " Block length is %d\n",                  sw . l );
-        fprintf( stderr, " Edit distance: %u\n",       distance );
-		 if (  strcmp ( sw.e, myers ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i\n", 1, 1, 1);
-		 else if (  strcmp ( sw.e, standardEditD ) == 0 ) fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i \n", sw . I , sw . D , sw . S );
+        if (  strcmp ( sw . e, edit_distance ) == 0 )
+	{
+		fprintf( stderr, " Edit distance: %u\n",       distance );
+		fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i \n", sw . I , sw . D , sw . S );
+	}
         fprintf( stderr, " Rotation                 : %u\n",       rotation );
         fprintf( stderr, " (Multi)FASTA output file : %s\n",       sw . output_filename );
         fprintf( stderr, "Elapsed time for comparing sequences: %lf secs\n", ( end - start ) );

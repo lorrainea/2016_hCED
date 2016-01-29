@@ -22,8 +22,8 @@
 #define ALLOC_SIZE              1048576
 #define DEL                     '$'
 #define DEL_STR                 "$"
-#define standardEditD           "V"
-#define myers	                "Y"
+#define no_edit_distance	"N"
+#define edit_distance		"Y"
 
 #define MAX2(a,b) ((a) > (b)) ? (a) : (b)
 #define MIN2(a,b) ((a) < (b)) ? (a) : (b)

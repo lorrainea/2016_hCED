@@ -1,6 +1,6 @@
 /**
-    CSC: Circular Sequence Comparison
-    Copyright (C) 2015 Solon P. Pissis, Ahmad Retha, Fatima Vayani 
+    hCED: Heuristic Cyclic Edit Distance
+    Copyright (C) 2016 Solon P. Pissis, Lorraine A. K. Ayad 
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -119,18 +119,19 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
            break;
 
          case 'P':
-           val = (double) atof ( optarg );
+           val = strtol ( optarg, &ep, 10 );
            if ( optarg == ep )
             {
               return ( 0 );
             }
            sw -> P = val;
+           args ++;
            break;
 
 	 case 'e':
-           free ( sw -> e );
            sw -> e = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
            strcpy ( sw -> e, optarg );
+           args ++;
            break;
 
 	case 'S':
@@ -250,8 +251,8 @@ void usage ( void )
    fprintf ( stdout, "  -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.\n" );
    fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n\n" );
    fprintf ( stdout, " Optional for edit distance model:\n" );
-   fprintf ( stdout, "  -e, --edit distance method  <str>     Choose 'Y' for unit cost or 'V' for general edit distance.\n"
-                     "                                        Default: Y.\n" );
+   fprintf ( stdout, "  -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output\n"
+                     "                                        rotation only. Default: Y.\n" );
    fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution when 'V is chosen for edit\n"
                      "                                        distance method. Default: 1.\n" );
    fprintf ( stdout, "  -I, --cost-insertion        <int>     Cost of insertion when 'V' is chosen for edit\n"

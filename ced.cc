@@ -290,16 +290,17 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	
 	create_rotation( x, ( *rotation ), x_final_rotation );
 
-	if ( strcmp ( sw . e, standardEditD ) == 0 )
-	{
-		int sub = sw . S;
-		int ins = sw . I; 
-		int del = sw . D;
-		editDistance( x_final_rotation, y, m, n, distance, sub, ins, del ); 	
-	}
-	else if ( strcmp ( sw . e,myers ) == 0 )
+	int sub = sw . S;
+	int ins = sw . I; 
+	int del = sw . D;
+
+	if ( strcmp ( sw . e, edit_distance ) == 0 && ins == 1 && del == 1 && sub == 1 )
 	{
 		editDistanceMyers( x_final_rotation, y, m, n, distance );
+	}
+	else if ( strcmp ( sw . e, edit_distance ) == 0 )
+	{
+		editDistance( x_final_rotation, y, m, n, distance, sub, ins, del ); 	
 	}
 
 	free ( xr );
