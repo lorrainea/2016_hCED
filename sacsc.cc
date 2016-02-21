@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include "csc.h"
+#include "hced.h"
 #include "sacsc.h"
 
 #ifdef _USE_64
