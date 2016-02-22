@@ -46,11 +46,17 @@ int delta ( char a, char b, struct TSwitch sw )
     }
  }
 
-
-unsigned int nw_ag_allocation( unsigned int m, unsigned int n, int ** &I, int ** &D, int ** &T )
+unsigned int nw_ag ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score )
 {
 	int i;
+	int j;
+	int g = sw . O;
+	int h = sw . E;
+	int u, v, w;
 
+	int ** T;
+	int ** I;
+	int ** D;
 	if ( ( T = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
         {
                 fprintf( stderr, " Error: T could not be allocated!\n");
@@ -90,17 +96,6 @@ unsigned int nw_ag_allocation( unsigned int m, unsigned int n, int ** &I, int **
                         return ( 0 );
                 }
         }
-
-	return EXIT_SUCCESS;
-}
-
-
-unsigned int nw_ag ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score, int ** &I, int ** &D, int ** &T)
-{
-	int i, j;
-	int g = sw . O;
-	int h = sw . E;
-	int u, v, w;
         
         for ( i = 0; i < m + 1; i++ )
 	{
@@ -140,20 +135,33 @@ unsigned int nw_ag ( unsigned char * p, unsigned int m, unsigned char * t, unsig
     	}
 
 	( * score ) = T[m][n];
+
+
+        for ( i = 0; i < m + 1; i ++ )
+	{
+		free ( D[i] );
+		free ( I[i] );
+		free ( T[i] );
+	}
+	free ( I );
+	free ( D );
+	free ( T );
 	
 	return EXIT_SUCCESS;
 }
 
-
-unsigned int nw_allocation( unsigned int m, unsigned int n, int ** &T )
+unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score )
 {
-
+	int ins = sw . f;
+	int del = sw . g;
+	int ** T;
+	int i, j;
 	if ( ( T = ( int ** ) calloc ( ( m + 1 ) , sizeof( int * ) ) ) == NULL )
         {
                 fprintf( stderr, " Error: T could not be allocated!\n");
                 return ( 0 );
         }
-        for ( int i = 0; i < m + 1; i ++ )
+        for ( i = 0; i < m + 1; i ++ )
         {
                 if ( ( T[i] = ( int * ) calloc ( ( n + 1 ) , sizeof( int ) ) ) == NULL )
                 {
@@ -161,17 +169,6 @@ unsigned int nw_allocation( unsigned int m, unsigned int n, int ** &T )
                         return ( 0 );
                 }
         }
-	
-	return EXIT_SUCCESS;
-}
-
-
-unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned int n, struct TSwitch  sw, int * score, int ** &T )
-{
-	int ins = sw . f;
-	int del = sw . g;
-	int i, j;
-	
         for ( i = 0; i < m + 1; i++ )
 	{
 		T[i][0] = ins * i;
@@ -188,6 +185,11 @@ unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned
 	}
 
     	( * score ) = T[m][n];
+        for ( i = 0; i < m + 1; i ++ )
+	{
+		free ( T[i] );
+	}
+	free ( T );
 
 	return EXIT_SUCCESS;
 }
@@ -196,20 +198,16 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 {
 	unsigned int rot;
 	unsigned int dist;
-	int ** I;
-	int ** D;
-	int ** T;
 	circular_sequence_comparison ( x, y, sw, &rot, &dist );
 
 	( * distance ) = dist;
 
 	unsigned int m = strlen ( ( char * ) x );
 	unsigned int n = strlen ( ( char * ) y );
-	unsigned char * xr;	
-	
+	unsigned char * xr;
 	xr = ( unsigned char * ) calloc( ( m + 1 ) , sizeof( unsigned char ) );
 	create_rotation ( x, rot, xr );
-
+	
 	unsigned char * X;
 	unsigned char * Y;
 
@@ -238,25 +236,18 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	int max_score = score;
 	unsigned int rrot = 0;
 	unsigned char * Xr = ( unsigned char * ) calloc( ( 3 * sl + 1 ) , sizeof( unsigned char ) );
-
-	if( sw . O < 0 )
-		nw_ag_allocation ( m, n, I, D, T );
-	else 
-		nw_allocation( m, n, T );
-
 	for ( int i = 0; i < mm; i++ )
 	{
 		if ( i >= sl && i < 2 * sl )
 			continue;
-
-		memcpy ( &Xr[0], &X[i], ( 3 * sl ) - i );
-    		memcpy ( &Xr[( 3 * sl ) - i], &X[0], i );
-    		Xr[3 * sl] = '\0';
+	
+		Xr[0] = '\0';
+		create_rotation ( X, i, Xr );
 
 		if ( sw . O < 0 )
-			nw_ag ( Xr, mm , Y, nn, sw, &score, I, D, T );
+			nw_ag ( Xr, mm , Y, nn, sw, &score );
 		else
-			nw ( Xr, mm, Y, nn, sw, &score, T );
+			nw ( Xr, mm , Y, nn, sw, &score );
 
 		if ( score > max_score )
 		{
@@ -264,24 +255,7 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 			rrot = i;
 		}	 
 	}
-
-	for ( int j = 0; j < m + 1; j ++ )
-	{
-		free ( T[j] );
-		if ( sw . O < 0 )
-		{
-			free ( D[j] );
-			free ( I[j] );
-		}
-	}
-	free ( Xr );
-
-	if( sw . O < 0 )
-	{
-		free ( I );
-		free ( D );
-	}
-	free ( T );
+	free ( Xr);
 
 	int final_rot;
         if ( rrot < sl )
@@ -325,7 +299,6 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	free ( X );
 	free ( Y );
 	free( x_final_rotation );
-
 	return EXIT_SUCCESS;
 }
 
