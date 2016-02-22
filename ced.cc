@@ -251,7 +251,7 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 
 		memcpy ( &Xr[0], &X[i], ( 3 * sl ) - i );
     		memcpy ( &Xr[( 3 * sl ) - i], &X[0], i );
-    		Xr[m] = '\0';
+    		Xr[3 * sl] = '\0';
 
 		if ( sw . O < 0 )
 			nw_ag ( Xr, mm , Y, nn, sw, &score, I, D, T );
