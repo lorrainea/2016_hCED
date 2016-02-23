@@ -54,7 +54,7 @@ static struct option long_options[] =
 /* 
 Decode the input switches 
 */
-int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
+int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
  {
    int          oi;
    int          opt;
@@ -68,7 +68,7 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw )
    sw -> q                              = 5;
    sw -> l                              = 50;
    sw -> P                              = 1.0;
-   sw -> e                              = ( char * ) malloc ( ( 1 + 1 ) * sizeof ( char ) );
+   sw -> e                              = eD;
    sw -> e[0]      			= 'Y';
    sw -> e[1]      			= '\0';
    sw -> S				= 1;

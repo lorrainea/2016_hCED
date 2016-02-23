@@ -41,7 +41,7 @@ struct TSwitch
 };
 
 double gettime( void );
-int decode_switches ( int argc, char * argv [], struct TSwitch * sw );
+int decode_switches ( int argc, char * argv [], struct TSwitch * sw , char * eD );
 void usage ( void );
 void create_rotation ( unsigned char * x, unsigned int offset, unsigned char * rotation );
 void create_backward_rotation ( unsigned char * x, unsigned int offset, unsigned char * rotation );

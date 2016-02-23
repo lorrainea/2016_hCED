@@ -27,7 +27,7 @@
 #include "ced.h"
 using namespace std;
 
-int main(int argc, char **argv)
+int main( int argc, char **argv )
 {
 
 	struct TSwitch  sw;
@@ -38,13 +38,14 @@ int main(int argc, char **argv)
         char *           output_filename;        // the output file name
         unsigned char ** seq    = NULL;          // the sequence in memory
         unsigned char ** seq_id = NULL;          // the sequence id in memory
-	unsigned int     l, q;             // the program parameters
+	unsigned int     l, q;             	 // the program parameters
 	double           P;                      // the program parameters
 	char * 		 editDistance;
+	char * 		 eD = ( char * ) malloc ( ( 1 + 1 ) * sizeof ( char ) );
 	unsigned int     h, i, j, k;
 
 	/* Decodes the arguments */
-        i = decode_switches ( argc, argv, &sw );
+        i = decode_switches ( argc, argv, &sw , eD );
 
 	/* Check the arguments */
         if ( i < 4 )
@@ -238,7 +239,7 @@ int main(int argc, char **argv)
         }
         free ( seq );
         free ( seq_id );
-	free ( sw . e);
+	free ( eD );
         free ( sw . input_filename );
         free ( sw . output_filename );
 
