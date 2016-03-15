@@ -253,12 +253,9 @@ void usage ( void )
    fprintf ( stdout, " Optional for edit distance model:\n" );
    fprintf ( stdout, "  -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output\n"
                      "                                        rotation only. Default: Y.\n" );
-   fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution when 'V is chosen for edit\n"
-                     "                                        distance method. Default: 1.\n" );
-   fprintf ( stdout, "  -I, --cost-insertion        <int>     Cost of insertion when 'V' is chosen for edit\n"
-                     "                                        distance method. Default: 1.\n" );
-   fprintf ( stdout, "  -D, --cost-deletion         <int>     Cost of deletion when 'V' is chosen for edit\n"
-                     "                                        distance method. Default: 1.\n" );
+   fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution. Default: 1.\n" );
+   fprintf ( stdout, "  -I, --cost-insertion        <int>     Cost of insertion. Default: 1.\n" );
+   fprintf ( stdout, "  -D, --cost-deletion         <int>     Cost of deletion. Default: 1.\n" );
  }
 
 double gettime( void )
