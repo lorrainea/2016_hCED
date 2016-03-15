@@ -174,11 +174,11 @@ unsigned int nw ( unsigned char * p, unsigned int m, unsigned char * t, unsigned
 	
         for ( i = 0; i < m + 1; i++ )
 	{
-		T[i][0] = ins * i;
+		T[i][0] = del * i;
 	}
 	for ( j = 1; j < n + 1; j++ )
 	{
-		T[0][j] = del * j;
+		T[0][j] = ins * j;
 	}
 
         for ( i = 1; i < m + 1; i++ )
