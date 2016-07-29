@@ -243,7 +243,7 @@ void usage ( void )
    fprintf ( stdout, "  -l, --block-length          <int>     The length of each block.\n\n");
    fprintf ( stdout, " Optional for the Refinement stage:\n" );
    fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
-                     "                                        checking a block percentage of the ends. Default: 1.\n" );
+                     "                                        checking P blocks of the ends. Default: 1.\n" );
    fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
    fprintf ( stdout, "  -r, --score-mismatch        <int>     Score of mismatch for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -f, --score-insertion       <int>     Score of insertion for refinement. Default: -1.\n" );
