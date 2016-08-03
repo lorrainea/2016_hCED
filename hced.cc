@@ -174,6 +174,12 @@ int main( int argc, char **argv )
 
 	unsigned int m = strlen ( ( char * ) seq[0] );
 	unsigned int n = strlen ( ( char * ) seq[1] );
+	
+	if( sw . P * sw . l * 3 > m )
+	{
+		fprintf( stderr, " Error: P is too large!\n" );
+		exit( EXIT_FAILURE );
+	}
 
 	if ( num_seqs > 2 )
 	{
