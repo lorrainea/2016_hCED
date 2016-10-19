@@ -107,7 +107,7 @@ unsigned int nw_ag ( unsigned char * p, unsigned int m, unsigned char * t, unsig
 		D[i][0] = m * sw . r;
 		I[i][0] = m * sw . r;
 	}
-	for ( j = 1; j < n + 1; j++ )
+	for ( j = 0; j < n + 1; j++ )
 	{
 		D[0][j] = n * sw . r;
 		I[0][j] = n * sw . r;
