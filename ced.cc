@@ -240,9 +240,9 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	unsigned char * Xr = ( unsigned char * ) calloc( ( 3 * sl + 1 ) , sizeof( unsigned char ) );
 
 	if( sw . O < 0 )
-		nw_ag_allocation ( m, n, I, D, T );
+		nw_ag_allocation ( mm, nn, I, D, T );
 	else 
-		nw_allocation( m, n, T );
+		nw_allocation( mm, nn, T );
 
 	for ( int i = 0; i < mm; i++ )
 	{
@@ -265,7 +265,7 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 		}	 
 	}
 
-	for ( int j = 0; j < m + 1; j ++ )
+	for ( int j = 0; j < mm + 1; j ++ )
 	{
 		free ( T[j] );
 		if ( sw . O < 0 )
