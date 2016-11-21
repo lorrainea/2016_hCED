@@ -105,7 +105,6 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
               return ( 0 );
             }
            sw -> q = val;
-           args ++;
            break;
 
          case 'l':
@@ -115,7 +114,6 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
               return ( 0 );
             }
            sw -> l = val;
-           args ++;
            break;
 
          case 'P':
@@ -125,13 +123,11 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
               return ( 0 );
             }
            sw -> P = val;
-           args ++;
            break;
 
 	 case 'e':
            sw -> e = ( char * ) malloc ( ( strlen ( optarg ) + 1 ) * sizeof ( char ) );
            strcpy ( sw -> e, optarg );
-           args ++;
            break;
 
 	case 'S':
@@ -220,7 +216,7 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
        }
     }
 
-   if ( args < 4 )
+   if ( args < 2 )
      {
        usage ();
        exit ( 1 );
@@ -236,12 +232,14 @@ Usage of the tool
 void usage ( void )
  {
    fprintf ( stdout, " hCED <options>\n" );
-   fprintf ( stdout, " Required arguments for saCSC:\n" );
+   fprintf ( stdout, " Mandatory arguments:\n" );
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
    fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
-   fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length.\n");
-   fprintf ( stdout, " Optional for the Refinement stage:\n" );
+   fprintf ( stdout, "\n" );
+   fprintf ( stdout, " Optional for Stage 1:\n" );
+   fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length. Default: 5.\n");
    fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n");
+   fprintf ( stdout, " Optional for Stage 2 (Refinement):\n" );
    fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
                      "                                        checking P blocks of the ends. Default: 1.\n" );
    fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
@@ -250,7 +248,7 @@ void usage ( void )
    fprintf ( stdout, "  -g, --score-deletion        <int>     Score of deletion for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.\n" );
    fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n\n" );
-   fprintf ( stdout, " Optional for edit distance model:\n" );
+   fprintf ( stdout, " Optional for Stage 3 (Edit distance model):\n" );
    fprintf ( stdout, "  -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output\n"
                      "                                        rotation only. Default: Y.\n" );
    fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution. Default: 1.\n" );
