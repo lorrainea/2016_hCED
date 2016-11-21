@@ -240,8 +240,8 @@ void usage ( void )
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
    fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
    fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length.\n");
-   fprintf ( stdout, "  -l, --block-length          <int>     The length of each block.\n\n");
    fprintf ( stdout, " Optional for the Refinement stage:\n" );
+   fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n");
    fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
                      "                                        checking P blocks of the ends. Default: 1.\n" );
    fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
