@@ -236,7 +236,7 @@ void usage ( void )
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
    fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
    fprintf ( stdout, "\n" );
-   fprintf ( stdout, " Optional for Stage 1:\n" );
+   fprintf ( stdout, " Optional for Stage 1 (Algorithm saCSC):\n" );
    fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length. Default: 5.\n");
    fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n");
    fprintf ( stdout, " Optional for Stage 2 (Refinement):\n" );
