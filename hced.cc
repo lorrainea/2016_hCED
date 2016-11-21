@@ -175,6 +175,9 @@ int main( int argc, char **argv )
 	unsigned int m = strlen ( ( char * ) seq[0] );
 	unsigned int n = strlen ( ( char * ) seq[1] );
 	
+	if( sw . l == 0 )
+		sw . l = sqrt( m );
+	
 	if( sw . P * sw . l * 3 > m )
 	{
 		fprintf( stderr, " Error: P is too large!\n" );

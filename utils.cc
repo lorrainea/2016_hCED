@@ -66,7 +66,7 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
    sw -> input_filename                 = NULL;
    sw -> output_filename                = NULL;
    sw -> q                              = 5;
-   sw -> l                              = 50;
+   sw -> l                              = 0;
    sw -> P                              = 1.0;
    sw -> e                              = eD;
    sw -> e[0]      			= 'Y';
