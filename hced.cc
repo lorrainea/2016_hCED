@@ -22,6 +22,7 @@
 #include <string.h>
 #include <string>
 #include <sys/time.h>
+#include <math.h>
 #include "hced.h"
 #include "sacsc.h"
 #include "ced.h"
