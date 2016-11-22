@@ -15,7 +15,7 @@ distance between x and y.
   -q, --q-length              <int>     The q-gram length. Default: 5.
   -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).
  Optional for Stage 2 (Refinement):
-  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by
+  -P, --refine-blocks         <dbl>     Refine the rotation returned by saCSC by
                                         checking P blocks of the ends. Default: 1.
   -m, --score-match           <int>     Score of match for refinement. Default: 1.
   -r, --score-mismatch        <int>     Score of mismatch for refinement. Default: -1.
