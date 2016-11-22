@@ -234,8 +234,7 @@ void usage ( void )
    fprintf ( stdout, " hCED <options>\n" );
    fprintf ( stdout, " Mandatory arguments:\n" );
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
-   fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
-   fprintf ( stdout, "\n" );
+   fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n\n" );
    fprintf ( stdout, " Optional for Stage 1 (Algorithm saCSC):\n" );
    fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length. Default: 5.\n");
    fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n");
@@ -247,7 +246,7 @@ void usage ( void )
    fprintf ( stdout, "  -f, --score-insertion       <int>     Score of insertion for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -g, --score-deletion        <int>     Score of deletion for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.\n" );
-   fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n\n" );
+   fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n" );
    fprintf ( stdout, " Optional for Stage 3 (Edit distance model):\n" );
    fprintf ( stdout, "  -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output\n"
                      "                                        rotation only. Default: Y.\n" );

@@ -23,7 +23,6 @@ distance between x and y.
   -g, --score-deletion        <int>     Score of deletion for refinement. Default: -1.
   -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.
   -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.
-
  Optional for Stage 3 (Edit distance model):
   -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output
                                         rotation only. Default: Y.
