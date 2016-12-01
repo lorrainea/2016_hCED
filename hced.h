@@ -38,6 +38,7 @@ struct TSwitch
     char * 		 e;			 // edit distance method
     unsigned int         S, I, D;                // EDIT DISTANCE costs for substitution, insertion, deletion
     int                  m, r, f, g, O, E;       // SIMILARITY costs for edit distance match, substitution, insertion, deletion, gap open, gap extend
+    int 		 R;			 // computes edit distance for x,y and y,x
 };
 
 double gettime( void );

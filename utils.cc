@@ -46,6 +46,7 @@ static struct option long_options[] =
    { "score-deletion",     	optional_argument, NULL, 'g' },
    { "gap-open",     		optional_argument, NULL, 'O' },
    { "gap-extend",     		optional_argument, NULL, 'E' },
+   { "reverse-computation",     optional_argument, NULL, 'R' },
    { "help",                    no_argument,       NULL, 'h' },
    {  NULL,                     0,                 NULL,  0  }
  };
@@ -80,9 +81,10 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
    sw -> g				= -1;
    sw -> O				= 0;
    sw -> E				= 0;
+   sw -> R                              = 0;
    args = 0;
 
-   while ( ( opt = getopt_long ( argc, argv, "i:o:q:l:P:e:S:I:D:m:r:f:g:O:E:h", long_options, &oi ) ) != - 1 )
+   while ( ( opt = getopt_long ( argc, argv, "i:o:q:l:P:e:S:I:D:m:r:f:g:O:E:R:h", long_options, &oi ) ) != - 1 )
     {
       switch ( opt )
        {
@@ -211,6 +213,15 @@ int decode_switches ( int argc, char * argv [], struct TSwitch * sw, char * eD )
            sw -> E = val;
            break;
 
+	case 'R':
+           val = strtol ( optarg, &ep, 10 );
+           if ( optarg == ep )
+            {
+              return ( 0 );
+            }
+           sw -> R = val;
+           break;
+
          case 'h':
            return ( 0 );
        }
@@ -234,25 +245,29 @@ void usage ( void )
    fprintf ( stdout, " hCED <options>\n" );
    fprintf ( stdout, " Mandatory arguments:\n" );
    fprintf ( stdout, "  -i, --input-file            <str>     (Multi)FASTA input filename.\n" );
-   fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n\n" );
+   fprintf ( stdout, "  -o, --output-file           <str>     Output filename for the rotated sequences.\n" );
+   fprintf ( stdout, "\n" );
    fprintf ( stdout, " Optional for Stage 1 (Algorithm saCSC):\n" );
    fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length. Default: 5.\n");
-   fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n");
+   fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n\n");
    fprintf ( stdout, " Optional for Stage 2 (Refinement):\n" );
-   fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the rotation returned by saCSC by\n"
+   fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
                      "                                        checking P blocks of the ends. Default: 1.\n" );
    fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
    fprintf ( stdout, "  -r, --score-mismatch        <int>     Score of mismatch for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -f, --score-insertion       <int>     Score of insertion for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -g, --score-deletion        <int>     Score of deletion for refinement. Default: -1.\n" );
    fprintf ( stdout, "  -O, --gap-open              <int>     Score of gap opening for refinement. Default: NOT USED.\n" );
-   fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n" );
+   fprintf ( stdout, "  -E, --gap-extend            <int>     Score of gap extension for refinement. Default: NOT USED.\n\n" );
    fprintf ( stdout, " Optional for Stage 3 (Edit distance model):\n" );
    fprintf ( stdout, "  -e, --edit-distance         <str>     Choose 'Y' to calculate edit distance and 'N' to output\n"
                      "                                        rotation only. Default: Y.\n" );
    fprintf ( stdout, "  -S, --cost-substitution     <int>     Cost of substitution. Default: 1.\n" );
    fprintf ( stdout, "  -I, --cost-insertion        <int>     Cost of insertion. Default: 1.\n" );
-   fprintf ( stdout, "  -D, --cost-deletion         <int>     Cost of deletion. Default: 1.\n" );
+   fprintf ( stdout, "  -D, --cost-deletion         <int>     Cost of deletion. Default: 1.\n\n" );
+   fprintf ( stdout, " Compute hCED(x,y) and hCED(y,x):\n" );
+   fprintf ( stdout, "  -R, --reverse-computation   <int>     Choose '0' to compute hCED(x,y) or '1' to compute both hCED(x,y). \n"
+                     "                                        and hCED(y,x). Default: 0. \n");
  }
 
 double gettime( void )

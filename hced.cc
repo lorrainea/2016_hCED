@@ -19,6 +19,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fstream>
 #include <string.h>
 #include <string>
 #include <sys/time.h>
@@ -191,34 +192,74 @@ int main( int argc, char **argv )
         	fprintf( stderr, " Warning: Only the first two (%s, %s) will be processed!\n", seq_id[0], seq_id[1] );
 	}
 
-
-	/* Run the algorithm */
-	unsigned int distance = m + n;
-	unsigned int rotation = 0;
-	sacsc_refinement( seq[0], seq[1], sw, &rotation, &distance);
-
 	if ( ! ( out_fd = fopen ( output_filename, "w") ) )
 	{
 		fprintf ( stderr, " Error: Cannot open file %s!\n", output_filename );
 		return ( 1 );
 	}
-
+	
+	/* Run the algorithm */
+	unsigned int lowest_distance = 0;
+	unsigned int best_rotation = 0;
+	unsigned int distance_A = m + n;
+	unsigned int distance_B = m + n;
+	unsigned int rotation_A = 0;
+	unsigned int rotation_B = 0;
 	unsigned char * rot_str;
-	if ( ( rot_str = ( unsigned char * ) calloc ( m + 1, sizeof ( unsigned char ) ) ) == NULL )
+
+	sacsc_refinement( seq[0], seq[1], sw, &rotation_A, &distance_A);
+
+	if( sw . R == 1 )
 	{
-		fprintf ( stderr, " Error: Could not allocate rot_str!\n" );
-		return ( 1 );
+		sacsc_refinement( seq[1], seq[0], sw, &rotation_B, &distance_B);
+
+		if( distance_A <= distance_B )
+		{	
+			lowest_distance = distance_A;
+			best_rotation = rotation_A;
+
+			rot_str = ( unsigned char * ) calloc ( m + 1, sizeof ( unsigned char ) );
+			create_rotation ( seq[0], best_rotation, rot_str );
+
+			fprintf( out_fd, ">%s\n", seq_id[0] );
+			fprintf( out_fd, "%s\n", rot_str );
+			free ( rot_str );
+			fprintf( out_fd, ">%s\n", seq_id[1] );
+			fprintf( out_fd, "%s\n", seq[1] );
+		}
+		else
+		{
+
+			lowest_distance = distance_B;
+			best_rotation = rotation_B;
+
+			rot_str = ( unsigned char * ) calloc ( n + 1, sizeof ( unsigned char ) );
+
+			create_rotation ( seq[1], best_rotation, rot_str );
+
+			fprintf( out_fd, ">%s\n", seq_id[0] );
+			fprintf( out_fd, "%s\n",  seq[0] );
+			free ( rot_str );
+			fprintf( out_fd, ">%s\n", seq_id[1] );
+			fprintf( out_fd, "%s\n", rot_str );
+		}
+	}
+	else 
+	{
+		lowest_distance = distance_A;
+		best_rotation = rotation_A;
+
+		rot_str = ( unsigned char * ) calloc ( m + 1, sizeof ( unsigned char ) );
+		create_rotation ( seq[0], best_rotation, rot_str );
+
+		fprintf( out_fd, ">%s\n", seq_id[0] );
+		fprintf( out_fd, "%s\n", rot_str );
+		free ( rot_str );
+		fprintf( out_fd, ">%s\n", seq_id[1] );
+		fprintf( out_fd, "%s\n", seq[1] );
 	}
 
-	create_rotation ( seq[0], rotation, rot_str );
-
 	double end = gettime();
-
-	fprintf( out_fd, ">%s\n", seq_id[0] );
-	fprintf( out_fd, "%s\n", rot_str );
-	free ( rot_str );
-	fprintf( out_fd, ">%s\n", seq_id[1] );
-	fprintf( out_fd, "%s\n", seq[1] );
 
 
 	if ( fclose ( out_fd ) )
@@ -234,10 +275,10 @@ int main( int argc, char **argv )
         fprintf( stderr, " Block length is %d\n",                  sw . l );
         if (  strcmp ( sw . e, edit_distance ) == 0 )
 	{
-		fprintf( stderr, " Edit distance: %u\n",       distance );
+		fprintf( stderr, " Edit distance: %u\n",       lowest_distance );
 		fprintf( stderr, " Operation costs: I = %i, D = %i, S = %i \n", sw . I , sw . D , sw . S );
 	}
-        fprintf( stderr, " Rotation                 : %u\n",       rotation );
+        fprintf( stderr, " Rotation                 : %u\n",       best_rotation );
         fprintf( stderr, " (Multi)FASTA output file : %s\n",       sw . output_filename );
         fprintf( stderr, "Elapsed time for comparing sequences: %lf secs\n", ( end - start ) );
 
