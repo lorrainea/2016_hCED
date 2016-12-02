@@ -251,7 +251,7 @@ void usage ( void )
    fprintf ( stdout, "  -q, --q-length              <int>     The q-gram length. Default: 5.\n");
    fprintf ( stdout, "  -l, --block-length          <int>     The length of each block. Default: sqrt(seq_len).\n\n");
    fprintf ( stdout, " Optional for Stage 2 (Refinement):\n" );
-   fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the alignment of saCSC by\n"
+   fprintf ( stdout, "  -P, --refine-blocks         <dbl>     Refine the rotation returned by saCSC by\n"
                      "                                        checking P blocks of the ends. Default: 1.\n" );
    fprintf ( stdout, "  -m, --score-match           <int>     Score of match for refinement. Default: 1.\n" );
    fprintf ( stdout, "  -r, --score-mismatch        <int>     Score of mismatch for refinement. Default: -1.\n" );
