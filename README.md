@@ -36,4 +36,9 @@ distance between x and y.
   -R, --reverse-computation   <int>     Choose '0' to compute hCED(x,y) or '1' to compute both hCED(x,y). 
                                         and hCED(y,x). Default: 0. 
 ```
+<b>Citation</b>
+```
+L. A. K. Ayad, C. Barton, S. P. Pissis, "A faster and more accurate heuristic for cyclic edit distance computation", Pattern Recognition Letters, 2017.
+```
+
 <b>License</b>: GNU GPLv3 License; Copyright (C) 2016 Lorraine A. K. Ayad and Solon P. Pissis
