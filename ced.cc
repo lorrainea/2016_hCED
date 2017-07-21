@@ -16,16 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 
-#include <seqan/align.h>
+
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "hced.h"
+#include <string.h>
+#include <climits>
 #include "sacsc.h"
+#include "hced.h"
 #include "ced.h"
+#include "edlib.h"
 
 using namespace std;
-using namespace seqan;
+
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
 #define MAX3(a, b, c) ((a) > (b) ? ((a) > (c) ? (a) : (c)) : ((b) > (c) ? (b) : (c)))
 
@@ -330,17 +332,11 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 }
 
 /*
-Myers Bit-Vector algorithm implemented using SeqAn Library
-www.seqan.de
+Myers Bit-Vector algorithm implemented using edlib Library
 */
 int editDistanceMyers( unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance )
 {
-	typedef String<char> TSequence;
-
-	TSequence seq1 = xInput;
-	TSequence seq2 = yInput;
-
-	int score = globalAlignmentScore( seq1, seq2, MyersBitVector() )/-1;
+	int score = edlibAlign( (const char*) xInput, strlen( (char*) xInput ), (const char*) yInput, strlen( (char*) yInput ), edlibDefaultAlignConfig()).editDistance;
 
 	( * distance ) = score;
 
