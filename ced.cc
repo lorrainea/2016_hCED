@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <climits>
+#include <algorithm>
 #include "sacsc.h"
 #include "hced.h"
 #include "ced.h"
@@ -320,7 +321,9 @@ unsigned int sacsc_refinement ( unsigned char * x, unsigned char * y, struct TSw
 	}
 	else if ( strcmp ( sw . e, edit_distance ) == 0 )
 	{
-		editDistance( x_final_rotation, y, m, n, distance, sub, ins, del ); 	
+		if( m < n )
+			editDistance( x_final_rotation, y, m, n, distance, sub, ins, del ); 
+		else editDistance( y, x_final_rotation, n, m, distance,  sub, ins, del );	
 	}
 
 	free ( xr );
@@ -343,29 +346,51 @@ int editDistanceMyers( unsigned char * xInput, unsigned char * yInput, int mInpu
 	return EXIT_SUCCESS;
 }
 
-unsigned int editDistance(unsigned char * xInput, unsigned char * yInput, int mInput, int nInput, unsigned int * distance, int sub, int ins, int del )
-{
-	unsigned int x, y, lastdiag, olddiag;
-	unsigned int match = 0;
-	unsigned int * column;
-	column = ( unsigned int * ) calloc ( mInput + 1 , sizeof(unsigned int));
-	
-	for (y = 1; y <= mInput; y++)
-		column[y] = y;
 
-	for (x = 1; x <= nInput; x++) 
-	{
-        	column[0] = x;
-        	for (y = 1, lastdiag = x-1; y <= mInput; y++) 
-		{
-			olddiag = column[y];
-            		column[y] = MIN3(column[y] + ins, column[y-1] + del, lastdiag + (xInput[y-1] == yInput[x-1] ? match : sub));
-            		lastdiag = olddiag;
-        	}
-    	}
+
+
+unsigned int editDistance(unsigned char * x, unsigned char * y, int xSize, int ySize, unsigned int * distance, int sub, int ins, int del )
+{
 	
-	( * distance ) = column[mInput];
-	free ( column );
+	int pds = 0;
+	int mn = min( xSize, ySize );
+	int mx = max( xSize, ySize );
+	
+	unsigned int * ed =  ( unsigned int * ) calloc ( mn + 1 , sizeof(unsigned int));
+    	ed[0] = 0;
+
+	for (int i = 1; i < mn + 1; ++i) 
+	{
+		ed[i] = ed[i - 1] + del;
+	}
+
+	int prev_diag = 0;
+	for (int j = 1; j < mx + 1; ++j) 
+	{
+		prev_diag = ed[0], 
+		pds = 0;
+        	ed[0] = ed[0] + ins;
+	
+
+		for (int i = 1; i < mn + 1; ++i) 
+		{
+		    	pds = ed[i];
+			if (x[j - 1] == y[i - 1])	
+			{
+		        	ed[i] = prev_diag;
+			} 
+			else 
+			{
+				ed[i] = MIN3( ed[i - 1] + del, ed[i] + ins ,  prev_diag + sub );
+			}
+			prev_diag = pds;
+		}
+	}
+  
+
+	( * distance ) = ed[mn];
+
+	free( ed );
 	return EXIT_SUCCESS;
 }
 
