@@ -239,9 +239,9 @@ int main( int argc, char **argv )
 
 			fprintf( out_fd, ">%s\n", seq_id[0] );
 			fprintf( out_fd, "%s\n",  seq[0] );
-			free ( rot_str );
 			fprintf( out_fd, ">%s\n", seq_id[1] );
 			fprintf( out_fd, "%s\n", rot_str );
+			free ( rot_str );
 		}
 	}
 	else 
